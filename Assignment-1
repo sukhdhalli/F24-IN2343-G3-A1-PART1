@@ -1,0 +1,153 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class CollegeEnrollmentSystem {
+
+    // Base class for all people in the system
+    static class Person {
+        private String id;
+        private String name;
+        private String email;
+
+        public Person(String id, String name, String email) {
+            this.id = id;
+            this.name = name;
+            this.email = email;
+        }
+
+        // Getters
+        public String getId() { return id; }
+        public String getName() { return name; }
+        public String getEmail() { return email; }
+
+        @Override
+        public String toString() {
+            return name + " (" + email + ")";
+        }
+    }
+
+    // Class representing a student
+    static class Student extends Person {
+        private String studentId;
+        private List<Course> enrolledCourses;
+
+        public Student(String id, String name, String email, String studentId) {
+            super(id, name, email);
+            this.studentId = studentId;
+            this.enrolledCourses = new ArrayList<>();
+        }
+
+        // Getters
+        public String getStudentId() { return studentId; }
+        public List<Course> getEnrolledCourses() { return enrolledCourses; }
+
+        // Method to enroll in a course
+        public void enrollInCourse(Course course) {
+            if (!enrolledCourses.contains(course)) {
+                enrolledCourses.add(course);
+                course.addStudent(this);
+            }
+        }
+    }
+
+    // Class representing an instructor
+    static class Instructor extends Person {
+        private String instructorId;
+        private List<Course> teachingCourses;
+
+        public Instructor(String id, String name, String email, String instructorId) {
+            super(id, name, email);
+            this.instructorId = instructorId;
+            this.teachingCourses = new ArrayList<>();
+        }
+
+        // Getters
+        public String getInstructorId() { return instructorId; }
+        public List<Course> getTeachingCourses() { return teachingCourses; }
+    }
+
+    // Class representing a course
+    static class Course {
+        private String courseId;
+        private String courseName;
+        private Instructor instructor;
+        private List<Student> enrolledStudents;
+        private static final int MAX_CAPACITY = 30; // example capacity
+
+        public Course(String courseId, String courseName, Instructor instructor) {
+            this.courseId = courseId;
+            this.courseName = courseName;
+            this.instructor = instructor;
+            this.enrolledStudents = new ArrayList<>();
+        }
+
+        // Getters
+        public String getCourseId() { return courseId; }
+        public String getCourseName() { return courseName; }
+        public Instructor getInstructor() { return instructor; }
+        public List<Student> getEnrolledStudents() { return enrolledStudents; }
+
+        public void addStudent(Student student) {
+            if (enrolledStudents.size() < MAX_CAPACITY) {
+                enrolledStudents.add(student);
+            } else {
+                System.out.println("Course is full!");
+            }
+        }
+    }
+
+    // Main class to manage the enrollment system
+    static class EnrollmentSystem {
+        private List<Student> students;
+        private List<Course> courses;
+
+        public EnrollmentSystem() {
+            this.students = new ArrayList<>();
+            this.courses = new ArrayList<>();
+        }
+
+        // Method to add a student
+        public void addStudent(Student student) {
+            students.add(student);
+        }
+
+        // Method to add a course
+        public void addCourse(Course course) {
+            courses.add(course);
+        }
+
+        // Method to generate student schedules
+        public void generateStudentSchedules() {
+            for (Student student : students) {
+                System.out.println("Schedule for " + student.getName() + ":");
+                for (Course course : student.getEnrolledCourses()) {
+                    System.out.println(" - " + course.getCourseName() + " taught by " + course.getInstructor().getName());
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        EnrollmentSystem system = new EnrollmentSystem();
+
+        Instructor instructor1 = new Instructor("I001", "Dr. Smith", "smith@example.com", "INST001");
+        Instructor instructor2 = new Instructor("I002", "Dr. Johnson", "johnson@example.com", "INST002");
+
+        Course course1 = new Course("C001", "Math 101", instructor1);
+        Course course2 = new Course("C002", "Physics 101", instructor2);
+
+        system.addCourse(course1);
+        system.addCourse(course2);
+
+        Student student1 = new Student("S001", "Alice", "alice@example.com", "STU001");
+        Student student2 = new Student("S002", "Bob", "bob@example.com", "STU002");
+
+        system.addStudent(student1);
+        system.addStudent(student2);
+
+        student1.enrollInCourse(course1);
+        student2.enrollInCourse(course2);
+
+        system.generateStudentSchedules();
+    }
+}
